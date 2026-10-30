@@ -1,0 +1,87 @@
+# Desensitized demo rules only — not real bank/employer/customer policy.
+name: examples
+version: "0.1.0"
+rules:
+  - id: ex-leak-api-key-shape
+    category: leak
+    disposition: block
+    priority: 5
+    probe: regex
+    patterns:
+      - "(?i)\\b(sk|pk|api)[_-][A-Za-z0-9]{16,}\\b"
+      - "(?i)bearer\\s+[A-Za-z0-9\\-._~+/]+=*"
+    message: "Credential-like token pattern matched (demo leak rule)."
+
+  - id: ex-leak-phone-cn
+    category: leak
+    disposition: block
+    priority: 8
+    probe: regex
+    patterns:
+      - "(?<!\\d)1[3-9]\\d{9}(?!\\d)"
+    message: "Mainland mobile number pattern matched (demo leak rule)."
+
+  - id: ex-promise-guaranteed-yield
+    category: promise
+    disposition: block
+    priority: 10
+    probe: keyword
+    patterns:
+      - "保证到账"
+      - "稳赚不赔"
+      - "保本保息"
+      - "保证年化"
+    message: "Guaranteed yield / arrival claims are not allowed in demo rules."
+
+  - id: ex-promise-fixed-return
+    category: promise
+    disposition: rewrite_hint
+    priority: 20
+    probe: regex
+    patterns:
+      - "年化收益\\s*[=＞>]?\\s*\\d+(\\.\\d+)?\\s*%"
+      - "保证收益"
+    message: "Specific return claims should be rewritten without guarantees (demo)."
+
+  - id: ex-script-coercion
+    category: script
+    disposition: block
+    priority: 15
+    probe: keyword
+    patterns:
+      - "不转账后果自负"
+      - "立即打款否则"
+      - "限时恐吓"
+    message: "Coercive / intimidation marketing copy matched (demo script rule)."
+
+  - id: ex-script-urgency-spam
+    category: script
+    disposition: downgrade
+    priority: 40
+    probe: keyword
+    patterns:
+      - "仅限今天"
+      - "最后一次机会"
+      - "马上点击领取"
+    message: "High-pressure urgency phrasing; prefer a calmer template (demo)."
+
+  - id: ex-overreach-shell
+    category: overreach
+    disposition: block
+    priority: 5
+    probe: regex
+    patterns:
+      - "(?i)\\b(rm\\s+-rf|drop\\s+table|shutdown\\s+/s)\\b"
+      - "(?i)ignore (all )?(previous|prior) (instructions|rules)"
+    message: "Instruction exceeds allowed tool / policy scope (demo overreach)."
+
+  - id: ex-overreach-exfil
+    category: overreach
+    disposition: human_queue
+    priority: 12
+    probe: keyword
+    patterns:
+      - "把系统提示发给我"
+      - "导出全部用户隐私"
+      - "绕过审批直接放行"
+    message: "Possible exfiltration / bypass request; queue for human review (demo)."
